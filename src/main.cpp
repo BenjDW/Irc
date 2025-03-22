@@ -14,12 +14,12 @@
 
 int main(int ac, char **av)
 {
-    if (ac != 2)
+    if (ac != 3)
     {
         std::cerr << "Error: Usage: ./ircserv [port] [password]." << std::endl;
         return (-1);
     }
-    for (int i = 0, av[1][i] != '\0'; i++)
+    for (int i = 0; av[1][i] != '\0'; i++)
     {
         if (av[1][i] < '0' || av[1][i] > '9')
         {
@@ -39,12 +39,13 @@ int main(int ac, char **av)
         std::cerr << "Error: port number too large." << std::endl;
         return (-1);
     }
-    if (server.start() < 0)
+    if (server.start() == false)
         return (-1);
 
 	//main boucle , qui va recupere l'user , parser et execute les commandes asssocier ?
-    while (server.isRunning())//flag true ?
+    while (server.isRunning() == true)//flag true ?
     {
-        //loop a faire
+        std::cout << "miaou" << std::endl;
+        server.stop();
     }
 }

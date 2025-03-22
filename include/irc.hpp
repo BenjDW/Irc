@@ -22,22 +22,26 @@ class Serv
         const std::string   password;
         bool    running;
 
+        struct sockaddr_in address;
+        int     fd;
+
     public:
         Serv();
         Serv(const int _port, const std::string _password);
         Serv(const Serv &origin);
         ~Serv();
 
-		// std::vector	client_tab; // vector d'objet d'users ou struct ?
-		// std::map 	// map qui contient tout les users/bind avec les sockets ?name/address ?
-
         Serv &operator=(const Serv &origin);
 
-        int getPort();
-        std::string getPassword();
-        bool isRunning();
-};
+        int getPort() const;
+        std::string getPassword() const;
+        int getSocket() const;
+        bool isRunning() const;
 
+        bool start();
+        void stop();
+};
+/*
 // class client contient les infos de l'user de façons a y accede depuis la database du serveur ?
 // (Nickname, user, namechannel ?)
 class Client
@@ -53,3 +57,4 @@ class Client
 		std::string Channel; //witch channel is the clients ?
 };
 
+*/
