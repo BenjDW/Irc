@@ -6,7 +6,10 @@ Serv::Serv(const int _port, const std::string _password) : port(_port), password
 
 Serv::Serv(const Serv &origin) : port(origin.getPort()), password(origin.getPassword()) {}
 
-Serv::~Serv() {}
+Serv::~Serv() 
+{
+	close(fd);//ferme le socket
+}
 
 Serv    &Serv::operator=(const Serv &origin)
 {
