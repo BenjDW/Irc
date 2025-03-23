@@ -43,8 +43,9 @@ int main(int ac, char **av)
         return (-1);
 
 	// transforme le socket serveur actif en passif pour ecoute (attendre) les connections
-	if (listen(server.getSocket(), 10) == -1)
-		std::cerr << "error listen socket" << std::endl;
+	// if (listen(server.getSocket(), 10) == -1)
+	// 	std::cerr << "error listen socket" << std::endl;
+
 	//main boucle , qui va recupere l'user , parser et execute les commandes asssocier ?
     while (server.isRunning() == true)//flag true ?
     {

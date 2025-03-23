@@ -37,6 +37,11 @@ bool Serv::isRunning() const
     return running;
 }
 
+int	Serv::get_epollfd() const
+{
+	return epollfd;
+}
+
 bool Serv::start()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -62,16 +67,24 @@ bool Serv::start()
 	int flags = fcntl(fd, F_GETFL, 0);// recupere le file socket fd
 	if (flags < 0)
 	{
-		perror("fcntl F_GETFL");
+		std::cerr << "fcntl F_GETFL" << std::endl;
 		close(fd);//ferme le socket quand on a fini , mis aussi dans le destructeur peu etre plus besoin du coup
-		exit(EXIT_FAILURE);
+		return false;
 	}
 	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0)// change le socket fd en non bloquant
 	{
-    	perror("fcntl F_SETFL");
+    	std::cerr << "fcntl F_SETFL" << std::endl;
 		close(fd);
-    	exit(EXIT_FAILURE);
+		return false;
 	}
+
+	// cree le fd epoll
+	epollfd = epoll_create1(0);
+    if (epollfd == -1)
+	{
+        std::cerr << "Error: epoll create" << std::endl;
+		return false;
+    }
 
     if (bind(fd, (struct sockaddr *)&address, sizeof(address)) < 0)
     {
@@ -86,6 +99,19 @@ bool Serv::start()
         close(fd);
         return false;
     }
+
+	// a voir ou on dois mettre se block dans le main ou ici
+	epevent.data.fd = fd;
+    epevent.events = EPOLLIN; // Surveiller les connexions entrantes
+
+	// va ajoute le socketfd a epoll et ajoute la struct event a surveille
+    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &epevent) == -1) 
+	{
+        perror("epoll_ctl");
+        close(fd), close(epollfd);
+        return false;
+    }
+
     running = true;
     std::cout << "Server running on port " << port << "." << std::endl;
     return true;

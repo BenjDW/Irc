@@ -6,9 +6,12 @@
 
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/epoll.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <vector>
+#include <map>
+#include <list>
 #include <cstring>
 #include <fcntl.h>
 
@@ -24,8 +27,9 @@ class Serv
 
         struct sockaddr_in address;
         int     fd;//socket fd
-		//epoll fd
-		//epoll struct event
+		int		epollfd;
+		struct epoll_event	epevent;
+		//
 
     public:
         Serv();
@@ -38,6 +42,7 @@ class Serv
         int getPort() const;
         std::string getPassword() const;
         int getSocket() const;
+		int	get_epollfd() const;
         bool isRunning() const;
 
         bool start();
