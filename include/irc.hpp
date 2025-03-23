@@ -23,7 +23,9 @@ class Serv
         bool    running;
 
         struct sockaddr_in address;
-        int     fd;
+        int     fd;//socket fd
+		//epoll fd
+		//epoll struct event
 
     public:
         Serv();

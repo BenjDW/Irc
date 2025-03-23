@@ -58,6 +58,21 @@ bool Serv::start()
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port);
 
+	//fcntl dois etre en premier pour mettre le sockets en non bloquant
+	int flags = fcntl(fd, F_GETFL, 0);// recupere le file socket fd
+	if (flags < 0)
+	{
+		perror("fcntl F_GETFL");
+		close(fd);//ferme le socket quand on a fini , mis aussi dans le destructeur peu etre plus besoin du coup
+		exit(EXIT_FAILURE);
+	}
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0)// change le socket fd en non bloquant
+	{
+    	perror("fcntl F_SETFL");
+		close(fd);
+    	exit(EXIT_FAILURE);
+	}
+
     if (bind(fd, (struct sockaddr *)&address, sizeof(address)) < 0)
     {
         std::cerr << "Error: Server: Bind failed." << std::endl;
