@@ -42,6 +42,21 @@ int	Serv::get_epollfd() const
 	return epollfd;
 }
 
+epoll_event Serv::getPevent() const
+{
+    return epevent;
+}
+
+epoll_event *Serv::getEvents() const
+{
+    return events;
+}
+
+epoll_event Serv::getEvent(int index) const
+{
+    return events[index];
+}
+
 bool Serv::start()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -115,6 +130,56 @@ bool Serv::start()
     running = true;
     std::cout << "Server running on port " << port << "." << std::endl;
     return true;
+}
+
+void Serv::loop()
+{
+    int nfds = epoll_wait(this->epollfd, this->events, 10, -1);
+    for (int i = 0; i < nfds; ++i)
+    {
+        if (this->events[i].data.fd == this->fd)
+        {
+            sockaddr_in client;
+            socklen_t cLen = sizeof(client);
+            int newsockfd = accept(server.getSocket(), (struct sockaddr *)&client, &cLen);
+            if (newsockfd < 0)
+            {
+                std::cerr << "Error: Can't accept client connection." << std::endl;
+                std::cerr << strerror(errno) << std::endl;
+                continue;
+            }
+
+
+            char host[NI_MAXHOST];
+            if (getnameinfo((struct sockaddr *)&client, cLen, host, NI_MAXHOST, NULL, 0, NI_NUMERICSERV) != 0)
+            {
+                close(newsockfd);
+                continue;
+            }
+
+            this->epevent.events = EPOLLIN;
+            this->epevent.data.fd = newsockfd;
+            if (epoll_ctl(this->epollfd, EPOLL_CTL_ADD, newsockfd, &epevent) < 0)
+            {
+                std::cerr << "Error: Can't add client to epoll." << std::endl;
+                std::cerr << strerror(errno) << std::endl;
+                close(newsockfd);
+            }
+
+            this->clients[newsockfd] = new Client(newsockfd, std::string(host));
+        }
+        else
+        {
+            char buffer[1024] = {0};
+            int user_fd = this->events[i].data.fd;
+            int bytes_received = recv(user_fd, buffer, sizeof(buffer) - 1, 0);
+
+            if (bytes_received > 0)
+                this->processMessage(user_fd, buffer);
+            else
+                this->close_client_connection(user_fd);
+        }
+    }
 }
 
 void Serv::stop()

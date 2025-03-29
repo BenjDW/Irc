@@ -49,15 +49,6 @@ int main(int ac, char **av)
 	//main boucle , qui va recupere l'user , parser et execute les commandes asssocier ?
     while (server.isRunning() == true)//flag true ?
     {
-        std::cout << "miaou" << std::endl;
-        // server.stop();
-		std::cout << "En attente d'une connexion..." << std::endl;
-		// faut utilise epoll sur le socket qui va ensuite permettre de lire ecrire accept en meme temps multiple connect
-    	// int client_socket = accept(server.getSocket(), (struct sockaddr *)&client_addr, &addr_len);
-    	// if (client_socket < 0)
-		// {
-        // 	perror("accept");
-    	// }
-		// fonction qui recupere l'ecoute pour 
+        server.loop();
     }
 }
