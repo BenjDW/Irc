@@ -4,6 +4,7 @@
 #include "irc.hpp"
 
 class Serv;
+class Commands;
 
 typedef void (*CommandFunction)(Serv &server, Client &user, std::string command);
 
@@ -12,7 +13,6 @@ class Serv
     private:
         int   port;
         const std::string   password;
-        bool    running;
 
         struct sockaddr_in address;
         int     fd;//socket fd
@@ -35,7 +35,6 @@ class Serv
         std::string getPassword() const;
         int getSocket() const;
 		int	get_epollfd() const;
-        bool isRunning() const;
         epoll_event getPevent() const;
         epoll_event getEvent(int index) const;
         Client *getClient(std::string nickname);

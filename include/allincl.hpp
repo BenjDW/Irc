@@ -12,6 +12,7 @@
 #include <list>
 #include <cstring>
 #include <cstdio>
+#include <csignal>
 #include <fcntl.h>
 #include <cerrno>
 #include <algorithm>

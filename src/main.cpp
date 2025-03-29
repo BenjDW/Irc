@@ -12,6 +12,14 @@
 // :dan!d@localhost PRIVMSG #chan ::-)   ->  ["#chan", ":-)"]
 // As these examples show, a trailing parameter (a final parameter with a preceding ':') has the same semantics as any other parameter, and MUST NOT be treated specially or stored separately once the ':' is stripped.
 
+int g_stopSignal = 0;
+
+static void onStopSignal(int signal)
+{
+	if (signal == SIGINT)
+		g_stopSignal = 1;
+}
+
 int main(int ac, char **av)
 {
     if (ac != 3)
@@ -47,6 +55,10 @@ int main(int ac, char **av)
 	// 	std::cerr << "error listen socket" << std::endl;
 
 	//main boucle , qui va recupere l'user , parser et execute les commandes asssocier ?
-    while (server.isRunning() == true)//flag true ?
+    while (g_stopSignal == 0)//flag true ?
+    {
+        signal(SIGINT, onStopSignal);
         server.loop();
+    }
+    server.stop();
 }

@@ -2,7 +2,19 @@
 
 Serv::Serv() : port(0) {}
 
-Serv::Serv(const int _port, const std::string _password) : port(_port), password(_password) {}
+Serv::Serv(const int _port, const std::string _password) : port(_port), password(_password)
+{
+	this->commands["PASS"] = Commands::pass_command;
+	this->commands["JOIN"] = Commands::join_command;
+	this->commands["NICK"] = Commands::nick_command;
+	this->commands["USER"] = Commands::user_command;
+	this->commands["PART"] = Commands::part_command;
+	this->commands["PRIVMSG"] = Commands::privmsg_command;
+	this->commands["KICK"] = Commands::kick_command;
+	this->commands["TOPIC"] = Commands::topic_command;
+	this->commands["INVITE"] = Commands::invite_command;
+	this->commands["MODE"] = Commands::mode_command;
+}
 
 Serv::Serv(const Serv &origin) : port(origin.getPort()), password(origin.getPassword()) {}
 
@@ -31,11 +43,6 @@ std::string Serv::getPassword() const
 int Serv::getSocket() const
 {
     return fd;
-}
-
-bool Serv::isRunning() const
-{
-    return running;
 }
 
 int	Serv::get_epollfd() const
@@ -232,7 +239,6 @@ bool Serv::start()
         return false;
     }
 
-    running = true;
     std::cout << "Server running on port " << port << "." << std::endl;
     return true;
 }
@@ -285,7 +291,6 @@ void Serv::loop()
                 this->close_client_connection(user_fd);
         }
     }
-	this->stop();
 }
 
 void Serv::stop()
@@ -300,6 +305,5 @@ void Serv::stop()
 	}
 	close(this->fd);
 	close(this->epollfd);
-	running = false;
 	std::cout << "Server stopped!" << std::endl;
 }

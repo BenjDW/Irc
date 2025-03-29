@@ -30,7 +30,7 @@ void Commands::pass_command(Serv &server, Client &user, std::string command)
         {
             user.sendMessage(ERR_PASSWORD(user.getNickname()));
             user.incrementTries();
-            if (user.getTries() >= MAX_PASSWORD_TRIES)
+            if (user.getTries() >= 3)
             {
                 user.sendMessage("You typed too many wrong passwords!\r\n");
                 server.close_client_connection(user.getId(), "Too much password tries!");

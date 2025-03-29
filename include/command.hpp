@@ -3,6 +3,8 @@
 
 #include "irc.hpp"
 
+class Serv;
+
 class Commands
 {
     private:
