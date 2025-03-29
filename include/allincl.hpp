@@ -1,0 +1,20 @@
+#pragma once
+
+#include <iostream>
+#include <stdlib.h>
+#include <iostream>
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <vector>
+#include <map>
+#include <list>
+#include <cstring>
+#include <fcntl.h>
+#include <cerrno>
+#include <algorithm>
+#include <string>
+#include <functional>
+#include <sstream>
+#include <arpa/inet.h>

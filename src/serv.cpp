@@ -57,6 +57,26 @@ epoll_event Serv::getEvent(int index) const
     return events[index];
 }
 
+Channel *Server::getChannel(std::string name)
+{
+	for (std::vector<Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
+	{
+		if ((*it)->getName() == name)
+			return (*it);
+	}
+	return (NULL);
+}
+
+Client *Server::getClient(std::string nickname)
+{
+	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+	{
+		if (it->second->getNickname() == nickname)
+			return (it->second);
+	}
+	return (NULL);
+}
+
 bool Serv::start()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0);
