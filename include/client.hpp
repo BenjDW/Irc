@@ -2,7 +2,9 @@
 #define CLIENT_HPP
 
 #include "irc.hpp"
+#include "channel.hpp"
 
+class Channel;
 class Client
 {
 	private:

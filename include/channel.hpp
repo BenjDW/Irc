@@ -2,7 +2,9 @@
 #define CHANNEL_HPP
 
 #include "irc.hpp"
+#include "client.hpp"
 
+class Client;
 class Channel
 {
     private:
@@ -22,8 +24,6 @@ class Channel
         Channel(std::string name);
         ~Channel();
 
-        void broadcast(std::string message);
-        void broadcast(std::string message, Client *client);
         void addClient(Client *client);
         void removeClient(Client *client);
         void addOperator(Client *client);

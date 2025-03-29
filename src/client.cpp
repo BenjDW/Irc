@@ -10,7 +10,7 @@ Client::~Client() {}
 
 int const &Client::getId() const
 {
-    return this->_id;
+    return this->id;
 }
 
 
@@ -47,14 +47,14 @@ void Client::setHostname(std::string newHost)
     this->host = newHost;
 }
 
-void Client::setChannel(Channel *channel)
+void Client::setChannel(Channel *_channel)
 {
-    this->_channel = channel;
+    this->channel = _channel;
 }
 
 Channel *Client::getChannel()
 {
-    return this->_channel;
+    return this->channel;
 }
 
 bool Client::isLogged() const

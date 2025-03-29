@@ -11,6 +11,7 @@
 #include <map>
 #include <list>
 #include <cstring>
+#include <cstdio>
 #include <fcntl.h>
 #include <cerrno>
 #include <algorithm>
@@ -18,3 +19,4 @@
 #include <functional>
 #include <sstream>
 #include <arpa/inet.h>
+#include <netdb.h>

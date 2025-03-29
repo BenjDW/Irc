@@ -17,6 +17,7 @@ Serv    &Serv::operator=(const Serv &origin)
     return *this;
 }
 
+/// GETTER ///
 int Serv::getPort() const
 {
     return port;
@@ -47,17 +48,12 @@ epoll_event Serv::getPevent() const
     return epevent;
 }
 
-epoll_event *Serv::getEvents() const
-{
-    return events;
-}
-
 epoll_event Serv::getEvent(int index) const
 {
     return events[index];
 }
 
-Channel *Server::getChannel(std::string name)
+Channel *Serv::getChannel(std::string name)
 {
 	for (std::vector<Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
 	{
@@ -67,7 +63,7 @@ Channel *Server::getChannel(std::string name)
 	return (NULL);
 }
 
-Client *Server::getClient(std::string nickname)
+Client *Serv::getClient(std::string nickname)
 {
 	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
 	{
@@ -77,6 +73,95 @@ Client *Server::getClient(std::string nickname)
 	return (NULL);
 }
 
+/*std::vector<Channel *> Serv::getChannels()
+{
+	return (this->channels);
+}*/
+
+/// MESSAGE PROCESSING ///
+void Serv::processMessage(int user_fd, const char *message)
+{
+	std::string msg(message);
+	std::string buffer;
+
+	this->clients[user_fd]->appendToBuffer(msg);
+	buffer = this->clients[user_fd]->getBuffer();
+	if (buffer.find_first_of("\r\n") == std::string::npos)
+		return;
+
+	std::vector<std::string> commands = splitCommands(buffer);
+	for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); ++it)
+		this->interpret_message(user_fd, *it);
+	if (this->clients[user_fd])
+		this->clients[user_fd]->clearBuffer();
+}
+
+std::vector<std::string> Serv::splitCommands(const std::string &msg)
+{
+	std::vector<std::string> commands;
+	std::istringstream stream(msg);
+	std::string command;
+
+	while (std::getline(stream, command))
+	{
+		if (command.find("\r\n") == std::string::npos)
+			command += "\r\n";
+		commands.push_back(command);
+	}
+
+	return commands;
+}
+
+void Serv::interpret_message(int user_id, std::string const &command)
+{
+	Client *user = this->clients[user_id];
+	std::string cmdname;
+
+	if (!user)
+	{
+		std::cerr << "Error: Interpret Message function can't get the client with id [" << user_id << "]" << std::endl;
+		return;
+	}
+
+	CommandFunction cmdf = NULL;
+	cmdname = command.substr(0, command.find_first_of(" \r\n"));
+
+	if (cmdname != "CAP" && cmdname != "PASS" && !user->isLogged())
+	{
+		std::cerr << "ERROR: Unauthorized connection, needs password!" << std::endl;
+		user->sendMessage(ERR_NOTREGISTERED(user->getNickname()));
+	}
+	else
+	{
+		cmdf = this->commands[cmdname];
+		if (cmdf != NULL)
+			cmdf(*this, *user, command);
+	}
+}
+
+void Serv::addChannel(Channel *channel)
+{
+	this->channels.push_back(channel);
+}
+
+void Serv::close_client_connection(int user_id, std::string reason)
+{
+	if (this->clients[user_id] != NULL)
+	{
+		for (std::vector<Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
+		{
+			(*it)->removeClient(this->clients[user_id]);
+			(*it)->removeOperator(this->clients[user_id]);
+		}
+		delete this->clients[user_id];
+		this->clients.erase(user_id);
+		close(user_id);
+		if (!reason.empty())
+			std::cout << "Kicked User " << user_id << " because " << reason << std::endl;
+	}
+}
+
+/// THREE MAIN ///
 bool Serv::start()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -161,7 +246,7 @@ void Serv::loop()
         {
             sockaddr_in client;
             socklen_t cLen = sizeof(client);
-            int newsockfd = accept(server.getSocket(), (struct sockaddr *)&client, &cLen);
+            int newsockfd = accept(fd, (struct sockaddr *)&client, &cLen);
             if (newsockfd < 0)
             {
                 std::cerr << "Error: Can't accept client connection." << std::endl;
@@ -200,9 +285,21 @@ void Serv::loop()
                 this->close_client_connection(user_fd);
         }
     }
+	this->stop();
 }
 
 void Serv::stop()
 {
-    running = false;
+	std::cout << "Server is stopping..." << std::endl;
+	for (std::vector<Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
+		delete *it;
+	for (std::map<int, Client *>::iterator iterator = this->clients.begin(); iterator != this->clients.end(); iterator++)
+	{
+		close(iterator->first);
+		delete iterator->second;
+	}
+	close(this->fd);
+	close(this->epollfd);
+	running = false;
+	std::cout << "Server stopped!" << std::endl;
 }

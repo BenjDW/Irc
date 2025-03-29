@@ -17,24 +17,6 @@ std::string Channel::getName()
   return this->name;
 }
 
-void Channel::broadcast(std::string message)
-{
-  for (std::vector<Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-  {
-    if (!(*it)->isBot())
-      (*it)->sendMessage(message);
-  }
-}
-
-void Channel::broadcast(std::string message, Client *client)
-{
-  for (std::vector<Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-  {
-    if ((*it) != client && !(*it)->isBot())
-      (*it)->sendMessage(message);
-  }
-}
-
 void Channel::addClient(Client *client)
 {
   this->clients.push_back(client);

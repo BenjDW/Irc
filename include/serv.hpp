@@ -3,6 +3,10 @@
 
 #include "irc.hpp"
 
+class Serv;
+
+typedef void (*CommandFunction)(Serv &server, Client &user, std::string command);
+
 class Serv
 {
     private:
@@ -33,11 +37,16 @@ class Serv
 		int	get_epollfd() const;
         bool isRunning() const;
         epoll_event getPevent() const;
-        epoll_event *getEvents() const;
         epoll_event getEvent(int index) const;
         Client *getClient(std::string nickname);
         Channel *getChannel(std::string name);
+        //std::vector<Channel *> Serv::getChannels();
 
+        void addChannel(Channel* channel);
+        void processMessage(int user_fd, const char *message);
+        std::vector<std::string> splitCommands(const std::string &msg);
+        void	interpret_message(int user_id, std::string const& command);
+        void	close_client_connection(int user_id, std::string reason = "");
 
         bool start();
         void loop();

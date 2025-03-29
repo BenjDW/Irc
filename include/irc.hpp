@@ -1,12 +1,12 @@
 #pragma once
 
 #include "allincl.hpp"
+#include "msg.hpp"
 
 #include "client.hpp"
 #include "channel.hpp"
-#include "server.hpp"
+#include "serv.hpp"
 
 class Client;
-class Server;
+class Serv;
 class Channel;
-typedef void (*CommandFunction)(Server &server, Client &user, std::string command);

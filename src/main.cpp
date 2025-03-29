@@ -48,7 +48,5 @@ int main(int ac, char **av)
 
 	//main boucle , qui va recupere l'user , parser et execute les commandes asssocier ?
     while (server.isRunning() == true)//flag true ?
-    {
         server.loop();
-    }
 }
