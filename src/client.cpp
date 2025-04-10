@@ -72,6 +72,16 @@ std::string Client::getUsername() const
     return this->user;
 }
 
+bool Client::isBot() const
+{
+	return (this->is_bot);
+}
+
+void Client::setIsBot(bool value)
+{
+	this->is_bot = value;
+}
+
 void Client::appendToBuffer(const std::string& msg) {
         buffer += msg;
 }
