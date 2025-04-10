@@ -3,6 +3,7 @@
 
 #include "irc.hpp"
 
+class Client;
 class Serv;
 
 class Commands

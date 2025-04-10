@@ -3,6 +3,7 @@
 
 #include "irc.hpp"
 
+class Bot;
 class Serv;
 class Commands;
 
@@ -23,6 +24,8 @@ class Serv
         std::map<std::string, CommandFunction> commands;
         std::vector<Channel *> channels;
 
+		Bot *bot;
+
     public:
         Serv();
         Serv(const int _port, const std::string _password);
@@ -39,6 +42,7 @@ class Serv
         epoll_event getEvent(int index) const;
         Client *getClient(std::string nickname);
         Channel *getChannel(std::string name);
+		Bot	*getBot();
         //std::vector<Channel *> Serv::getChannels();
 
         void addChannel(Channel* channel);
@@ -46,6 +50,7 @@ class Serv
         std::vector<std::string> splitCommands(const std::string &msg);
         void	interpret_message(int user_id, std::string const& command);
         void	close_client_connection(int user_id, std::string reason = "");
+		void 	sendMessageFromBot(Bot *bot, const std::string &target, const std::string &message);
 
         bool start();
         void loop();

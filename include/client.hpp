@@ -11,6 +11,7 @@ class Client
         int id;
 
         bool logged;
+		bool is_bot;
 
         int pass_tries;
 
@@ -37,12 +38,14 @@ class Client
         int const& getTries() const;
         Channel *getChannel();
         std::string getBuffer() const;
+		bool	isBot() const;
 
         void setUsername(std::string username);
         void setNickname(std::string newNickname);
         void setHostname(std::string newHost);
         void setChannel(Channel *channel);
         void setLogged();
+		void setIsBot(bool value);
 
         bool isLogged() const;
 
