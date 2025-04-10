@@ -1,8 +1,9 @@
 #include "../include/irc.hpp"
+#include "../include/bot.hpp"
 
 Serv::Serv() : port(0) {}
 
-Serv::Serv(const int _port, const std::string _password) : port(_port), password(_password)
+Serv::Serv(const int _port, const std::string _password) : port(_port), password(_password), bot(NULL)
 {
 	this->commands["PASS"] = Commands::pass_command;
 	this->commands["JOIN"] = Commands::join_command;
@@ -14,12 +15,15 @@ Serv::Serv(const int _port, const std::string _password) : port(_port), password
 	this->commands["TOPIC"] = Commands::topic_command;
 	this->commands["INVITE"] = Commands::invite_command;
 	this->commands["MODE"] = Commands::mode_command;
+
+	bot = new Bot("localhost", this);
 }
 
-Serv::Serv(const Serv &origin) : port(origin.getPort()), password(origin.getPassword()) {}
+Serv::Serv(const Serv &origin) : port(origin.getPort()), password(origin.getPassword()), bot(NULL) {}
 
 Serv::~Serv() 
 {
+	delete bot;
 	close(fd);//ferme le socket
 }
 
@@ -78,6 +82,11 @@ Client *Serv::getClient(std::string nickname)
 			return (it->second);
 	}
 	return (NULL);
+}
+
+Bot	*Serv::getBot()
+{
+	return (bot);
 }
 
 /*std::vector<Channel *> Serv::getChannels()
@@ -168,6 +177,25 @@ void Serv::close_client_connection(int user_id, std::string reason)
 	}
 }
 
+void	Serv::sendMessageFromBot(Bot *bot, const std::string &target, const std::string &message)
+{
+	if (!bot)
+		return ;
+	if (!target.empty() && target[0] == '#')
+	{
+		Channel *chan = getChannel(target);
+		if (chan)
+		{
+			chan->broadcast(":" + bot->getNickname() + " PRIVMSG " + target + " :" + message + "\r\n", bot);
+		}
+		return ;
+	}
+	Client *dest = getClient(target);
+	if (dest && dest != bot)
+	{
+		dest->sendMessage(":" + bot->getNickname() + " PRIVMSG " + target + " :" + message + "\r\n");
+	}
+}
 /// THREE MAIN ///
 bool Serv::start()
 {
