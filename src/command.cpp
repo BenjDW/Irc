@@ -1,4 +1,5 @@
 #include "../include/irc.hpp"
+#include "../include/bot.hpp"
 
 void Commands::pass_command(Serv &server, Client &user, std::string command)
 {
@@ -150,6 +151,13 @@ void Commands::join_command(Serv &server, Client &user, std::string command)
         channel = new Channel(args[0]);
         server.addChannel(channel);
         channel->addOperator(&user);
+
+		Bot *bot = server.getBot();
+		if (bot)
+		{
+			channel->addClient(bot);
+			channel->broadcast(":" + bot->getNickname() + " JOIN " + channel->getName() + "\r\n");
+		}
     }
     if (channel->isInviteOnly() && !channel->isClientOperator(&user) && !channel->isInvited(&user))
     {
@@ -176,8 +184,10 @@ void Commands::join_command(Serv &server, Client &user, std::string command)
     channel->broadcast(":" + user.getNickname() + " JOIN " + channel->getName() + "\r\n");
 
     for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
-        if (*it != &user)
+        if (*it != &user/* && !(*it)->isBot()*/)
             user.sendMessage(":" + (*it)->getNickname() + " JOIN " + channel->getName() + "\r\n");
+	if (Bot *bot = server.getBot())
+		bot->sendHelloMessage(channel->getName(), user.getNickname());
 }
 
 void Commands::nick_command(Serv &server, Client &user, std::string command)
