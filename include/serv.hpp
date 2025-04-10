@@ -5,23 +5,27 @@
 
 class Serv;
 class Commands;
+class Bot;
 
 typedef void (*CommandFunction)(Serv &server, Client &user, std::string command);
 
 class Serv
 {
     private:
-        int   port;
+        int                 port;
         const std::string   password;
 
-        struct sockaddr_in address;
-        int     fd;//socket fd
-		int		epollfd;
-		struct epoll_event	epevent;
+        struct sockaddr_in  address;
+        int                 fd;     // socket fd
+        int                 epollfd;
+        struct epoll_event  epevent;
         struct epoll_event  events[10];
-        std::map<int, Client *> clients;
-        std::map<std::string, CommandFunction> commands;
-        std::vector<Channel *> channels;
+
+        std::map<int, Client *>                 clients;
+        std::map<std::string, CommandFunction>  commands;
+        std::vector<Channel *>                 channels;
+
+        Bot*                bot;
 
     public:
         Serv();
@@ -31,25 +35,27 @@ class Serv
 
         Serv &operator=(const Serv &origin);
 
-        int getPort() const;
-        std::string getPassword() const;
-        int getSocket() const;
-		int	get_epollfd() const;
-        epoll_event getPevent() const;
-        epoll_event getEvent(int index) const;
-        Client *getClient(std::string nickname);
-        Channel *getChannel(std::string name);
-        //std::vector<Channel *> Serv::getChannels();
+        int                 getPort() const;
+        std::string         getPassword() const;
+        int                 getSocket() const;
+        int                 get_epollfd() const;
+        epoll_event         getPevent() const;
+        epoll_event         getEvent(int index) const;
 
-        void addChannel(Channel* channel);
-        void processMessage(int user_fd, const char *message);
+        Client*             getClient(std::string nickname);
+        Channel*            getChannel(std::string name);
+        void                addChannel(Channel* channel);
+
+        Bot*                getBot() const { return bot; }
+
+        void                processMessage(int user_fd, const char *message);
         std::vector<std::string> splitCommands(const std::string &msg);
-        void	interpret_message(int user_id, std::string const& command);
-        void	close_client_connection(int user_id, std::string reason = "");
+        void                interpret_message(int user_id, std::string const& command);
+        void                close_client_connection(int user_id, std::string reason = "");
 
-        bool start();
-        void loop();
-        void stop();
+        bool                start();
+        void                loop();
+        void                stop();
 };
 
 #endif

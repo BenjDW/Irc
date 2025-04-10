@@ -1,4 +1,6 @@
 #include "../include/irc.hpp"
+#include "../include/channel.hpp"
+#include "../include/client.hpp"
 
 Channel::Channel(std::string _name)
 {

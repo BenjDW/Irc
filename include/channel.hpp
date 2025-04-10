@@ -2,7 +2,7 @@
 #define CHANNEL_HPP
 
 #include "irc.hpp"
-#include "client.hpp"
+// #include "client.hpp"
 
 class Client;
 class Channel
