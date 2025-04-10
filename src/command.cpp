@@ -184,8 +184,10 @@ void Commands::join_command(Serv &server, Client &user, std::string command)
     channel->broadcast(":" + user.getNickname() + " JOIN " + channel->getName() + "\r\n");
 
     for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
-        if (*it != &user/* && !(*it)->isBot()*/)
+	{
+        if (*it != &user/* && !(*it)->isBot()*/) // visibilité bot channel
             user.sendMessage(":" + (*it)->getNickname() + " JOIN " + channel->getName() + "\r\n");
+	}
 	if (Bot *bot = server.getBot())
 		bot->sendHelloMessage(channel->getName(), user.getNickname());
 }

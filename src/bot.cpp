@@ -6,7 +6,7 @@
 /*   By: bde-wits <bde-wits@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:23:16 by bde-wits          #+#    #+#             */
-/*   Updated: 2025/04/10 14:51:46 by bde-wits         ###   ########.fr       */
+/*   Updated: 2025/04/10 16:42:08 by bde-wits         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 
 Bot::Bot(const std::string &host, Serv *server) : Client(-1, host), _server(server)
 {
-	setNickname("Bot");
-	setUsername("Bot");
+	setNickname("coco_peroquet");
+	setUsername("coco_peroquet");
 	setLogged();
 	setIsBot(true);
 }

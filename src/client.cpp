@@ -3,6 +3,7 @@
 Client::Client(int _id, std::string hostname) : id(_id), host(hostname), channel(NULL)
 {
     this->logged = false;
+	this->is_bot = false;
     this->pass_tries = 0;
 }
 
